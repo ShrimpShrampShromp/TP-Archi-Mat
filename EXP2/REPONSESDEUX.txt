@@ -1,0 +1,66 @@
+Q2.1.1 Comment la fonction seed() retourne-t-elle sa valeur ?
+
+0x080001C6 1C48      ADDS     r0,r1,#1
+>elle met sa valeur de retour dans r0
+
+Q2.1.2 Comment les arguments aa, bb, cc, dd, ee sont-ils passés à la fonction sub01() ?
+
+>on remplit les registres de r0 à r6 en prenant en compte que seed() stocke sa valeur dans r0.
+
+Q2.1.3 Comment l'espace de stockage pour ces arguments est-il réservé ? Est-il libéré après usage ?
+
+0x080001CA B570      PUSH     {r4-r6,lr}
+>petit push des familles
+0x080001E8 BD70      POP      {r4-r6,pc}
+>petit pop des familles
+
+OPTIMISATION 0
+Q2.2.1 Comment la fonction seed() retourne-t-elle sa valeur ?
+
+83 C0 01 add    eax,0x1
+>le retour est stocké dans eax
+
+Q2.2.2 Comment les arguments aa, bb, cc, dd, ee sont-ils passés à la fonction sub01() ?
+
+>on résout les Fonctions des arguments, puis on metd tout dans la pile
+
+00401635 C7 04 24 03 00 00 00          mov    DWORD PTR [esp],0x3
+0040163C E8 A3 FF FF FF                call   0x4015e4 <seed>
+00401641 89 C3                         mov    ebx,eax
+00401643 C7 04 24 01 00 00 00          mov    DWORD PTR [esp],0x1
+0040164A E8 95 FF FF FF                call   0x4015e4 <seed>
+0040164F C7 44 24 10 05 00 00 00       mov    DWORD PTR [esp+0x10],0x5
+00401657 C7 44 24 0C 04 00 00 00       mov    DWORD PTR [esp+0xc],0x4
+0040165F 89 5C 24 08                   mov    DWORD PTR [esp+0x8],ebx
+00401663 C7 44 24 04 03 00 00 00       mov    DWORD PTR [esp+0x4],0x3
+
+Q2.2.3 Comment l'espace de stockage pour ces arguments est-il réservé ? Est-il libéré après usage ?
+
+8B 54 24 08 mov    edx,DWORD PTR [esp+0x8]
+8B 44 24 0C mov    eax,DWORD PTR [esp+0xc]
+tout est stocké dans la pile, on garde juste l'adresse de départ puis on stocke chaque donnée à la suite
+Non, il n'est pas libéré après usage et les données se font simplement oblitérer par de nouvelles
+
+
+OPTIMISATION 1
+Q2.2.4 Comment le traitement des arguments aa, bb, cc, dd, ee à l'intérieur de la fonction sub01() a-t-il été optimisé ?
+Le traitement des arguments se fait de manière "intelligente" en factorisant l'opération.
+
+Q2.2.5 En observant le contenu de la fonction sub01(), donner un résumé des règles d'utilisation des registres qui semblent être appliquées
+>edi, esi et ebx doivent être push avant de pouvoir être utilisés, et esp contient les arguments donnés à la fonction
+
+
+OPTIMISATION 3
+Q2.2.6 Comment l'appel à sub01() a-t-il été optimisé ?
+>On utilise un seul registre comme pointeur sur la pile et tous les arguments sont appelés d'un coup
+
+Q2.2.7 Quel est l'impact sur les opérations arithmétiques ?
+>il n'y a qu'une seule multiplication car les opérations intermédiaires sont faites directement dans les load
+
+Q2.3.1 Comment les arguments aa, bb, cc, dd, ee sont-ils passés à la fonction sub01() ?
+>ça le met pas du tout dans la pile ça utilise plein de registres
+
+Q2.3.2 En observant le contenu de la fonction main(), donner un résumé des règles d'utilisation des registres qui semblent être appliquées
+eax valeur de retour
+rsp stack pointer
+

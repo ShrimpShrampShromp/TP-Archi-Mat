@@ -1,0 +1,63 @@
+TP ARCHI MAT
+EXPÉRIENCE 1
+
+Q1.1.1 Comment les variables locales aa, bb, cc, dd, ee de la fonction sub01 sont-elles stockées ?
+0x080001B2 1C65      ADDS     r5,r4,#1
+>Dans les registres r4 à r8
+
+Q1.1.2 Comment l'espace de stockage pour ces variables est-il réservé ? Est-il libéré après usage ?
+0x080001A6 E92D41F0  PUSH     {r4-r8,lr}
+>Les cinq registres r4-r8 sont push au moment de la déclaration des variables, puis pop à la fin du programme.
+
+
+On passe en mode optimisation 1, qu'est ce qui change sur le stockage des variables?
+
+Q1.1.3 En quoi le stockage des variables locales a-t-il été amélioré ?
+0x080001AC 1C41      ADDS     r1,r0,#1
+>On utilise les registres r0 à r4 au lieu de push 5 registres on en push qu'un seul (r4)
+
+Q1.1.4 Comment l'appel à la fonction expose() a-t-il été optimisé ?
+en optimisation 0:
+0x080001C0 4640      MOV      r0,r8
+0x080001C2 F7FFFFE4  BL.W     expose (0x0800018E)
+en optimisation 1:
+0x080001B8 E8BD4010  POP      {r4,lr}
+0x080001BC F7FFBFE7  B.W      expose (0x0800018E)
+>le résultat (ee) est déjà dans r0 donc la compilateur gagne une opération
+
+
+X86 (32 bits)
+
+Optimisation zéro
+Q1.2.1 Comment les variables locales aa, bb, cc, dd, ee de la fonction sub01 sont-elles stockées ?
+>Elles sont stockées dans la pile adressée par le registre esp. On y accède grâce en prenant l'adresse
+contenue dans esp et en la décalant d'une certaine constante.
+
+Q1.2.2 Comment l'espace de stockage pour ces variables est-il alloué ? Est-il libéré après usage ?
+movl	&0x1, (%esp)
+>On alloue l'espace de stockage en initialisant la case mémoire pointée par esp à 1.
+add	$0x3c,%espp
+>On libère l'espace en incrémentant l'adresse contenue dans %esp pour qu'elle pointe après les variables qu'on
+a utilisées ?
+
+Optimisation un
+Q1.2.3 Qu'est-ce qui a changé dans le stockage des variables locales aa, bb, cc, dd, ee de la fonction sub01 ?
+lea    edx,[eax+eax*2]
+lea    eax,[edx+eax*8]
+>On stocke dans les registres plutot que la pile et il stocke pas toutes les variables?
+
+Q1.2.4 Comment les opérations arithmétiques portant sur des constantes on-t-elles été optimisées ?
+lea    edx,[eax+eax*2]
+lea    eax,[edx+eax*8]
+>Il ne prend en compte que le calcul total sur ee (qui est expose) et il supprime les constantes inutiles
+(a+1 puis a-1)
+
+
+X86-64 (64 bits)
+
+Optimisation zéro
+Q1.3.1 Comment les variables locales aa, bb, cc, dd, ee de la fonction sub01 sont-elles stockées ?
+>Comme en 32 bits (sur la pile) 
+Q1.3.2 Comment l'espace de stockage pour ces variables est-il réservé ? Est-il libéré après usage ?
+sub    rsp,0x48
+>Il est reservé en donnant une valeur pour la pile au début (oui)
