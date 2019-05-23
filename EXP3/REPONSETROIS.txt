@@ -1,0 +1,36 @@
+Q3.1.1 Observez la valeur retournée par sub2(), est-elle correcte ?
+
+>oui, c'est 0x90CC
+
+Q3.1.2 Le déroulement de la suite du programme est-il correct ? Sinon, à partir de quelle instruction y a-t-il une déviation ?
+
+>non, le programme plante (toutes les instructions sont movs r0,r0) à partir du retour de programme de sub01 : pop {pc}
+
+Q3.1.3 Quelle est la cause de l'incident ?
+
+>en écrivant dans le tableau, à la dernière boucle, on écrit dans une zone non alouée. et là problème, on écrit à l'adresse de l'instruction de retour, donc quand on atteint
+cette instruction le programme plante
+
+
+Q3.1.4 Quel est le mécanisme qui permet à ce programme de montrer l'apparence d'un fonctionnement normal en optimisation zéro ?
+
+0x0800018E F04F21E0  MOV      r1,#0xE000E000018E
+0x08000192 6148      STR      r0,[r1,#0x14]
+
+>il stocke la valeur de retour plutot que de faire pop {pc} il la remet en r0.
+
+Q3.2.1 Observez la valeur retournée par sub2(), est-elle correcte ?
+
+>oui, c'est 0x90CC
+
+Q3.2.2 Le déroulement de la suite du programme est-il correct ? Sinon, à partir de quelle instruction y a-t-il une déviation ?
+
+>le programme plante à l'intruction "ret" du sub01
+
+Q3.2.3 Quelle est la cause de l'incident ?
+
+l'adresse de l'instruction suivante est stockée à l'adresse 0065FEE8, qui est située juste après le tableau BUF. lorsque l'ont incrémente BUF[i+1] avec i=0, on modifie la
+valeur de l'adresse ce qui fait planter le programme quand il essaie de s'y rendre
+
+Q3.2.4 Quel est le mécanisme qui permet à ce programme de montrer l'apparence d'un fonctionnement normal en optimisation zéro ?
+on met l'adresse de la valeur de retour dans eax plutot que de dépendre uniquement de ret
